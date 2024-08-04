@@ -9,10 +9,10 @@ class Bitset {
 public:
     Bitset();
     explicit Bitset(const std::string& bits);
-    explicit Bitset(unsigned int number);
+    explicit Bitset(unsigned long long number);
     Bitset(const Bitset& other);
-    Bitset& operator=(const Bitset& other);
     Bitset(Bitset&& other) noexcept;
+    Bitset& operator=(const Bitset& other);
     Bitset& operator=(Bitset&& other) noexcept;
     void initialize();
     void set(std::size_t index, bool value = true);
@@ -26,12 +26,32 @@ public:
     int size() const;
     unsigned long to_ulong() const;
     std::string to_string() const;
-    
+
     BitManipulator<N> operator[](std::size_t index);
     bool operator[](std::size_t index) const;
+    
+    Bitset operator&(const Bitset& other);
+    Bitset operator|(const Bitset& other);
+    Bitset operator^(const Bitset& other);
+    Bitset operator~();
+
+    Bitset& operator&=(const Bitset& other);
+    Bitset& operator|=(const Bitset& other);
+    Bitset& operator^=(const Bitset& other);
+
+    Bitset& operator>>=(std::size_t shift); 
+    Bitset& operator<<=(std::size_t shift);
+    Bitset operator>>(std::size_t shift); 
+    Bitset operator<<(std::size_t shift);
+    
+    bool operator==(const Bitset& other) const;
+    bool operator!=(const Bitset& other) const;
 
     template <std::size_t M> 
     friend std::ostream& operator<<(std::ostream& os, const Bitset<M>& set);
+
+    template <std::size_t M> 
+    friend std::istream& operator>>(std::istream& is, Bitset<M>& bs);
 
     ~Bitset();
 

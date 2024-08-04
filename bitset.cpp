@@ -29,7 +29,7 @@ Bitset<N>::Bitset(const std::string& bits) {
     }
 }
 template <std::size_t N>
-Bitset<N>::Bitset(unsigned int number) {
+Bitset<N>::Bitset(unsigned long long number) {
     initialize(); 
     for (int i = 0; i < N; ++i) {
         if (number == 0) {
@@ -44,7 +44,8 @@ Bitset<N>::Bitset(unsigned int number) {
 }
 
 template <std::size_t N>
-Bitset<N>::Bitset(const Bitset& other) : length{other.length} {
+Bitset<N>::Bitset(const Bitset<N>& other) {
+    length = other.length;
     bitset = new unsigned char[other.length]();
     for (int i = 0; i < other.length; ++i) {
         bitset[i] = other.bitset[i];
@@ -52,8 +53,8 @@ Bitset<N>::Bitset(const Bitset& other) : length{other.length} {
 }
 
 template <std::size_t N>
-Bitset<N>::Bitset(Bitset&& other) noexcept
-    : length{other.length}, bitset{other.bitset} {
+Bitset<N>::Bitset(Bitset<N>&& other) noexcept
+    : bitset{other.bitset}, length{other.length} {
     other.bitset = nullptr;
     other.length = 0;
 }
@@ -176,6 +177,135 @@ bool Bitset<N>::operator[](std::size_t index) const {
 }
 
 template <std::size_t N>
+Bitset<N> Bitset<N>::operator&(const Bitset<N>& other) {
+    Bitset<N> result;
+    for (size_t i = 0; i < length; ++i) {
+        result.bitset[i] = bitset[i] & other.bitset[i];
+    }
+    return result;
+}
+
+template <std::size_t N>
+Bitset<N> Bitset<N>::operator|(const Bitset<N>& other) {
+    Bitset<N> result;
+    for (size_t i = 0; i < length; ++i) {
+        result.bitset[i] = bitset[i] | other.bitset[i];
+    }
+    return result;
+}
+
+template <std::size_t N>
+Bitset<N> Bitset<N>::operator^(const Bitset<N>& other) {
+    Bitset<N> result;
+    for (size_t i = 0; i < length; ++i) {
+        result.bitset[i] = bitset[i] ^ other.bitset[i];
+    }
+    return result;
+}
+
+template <std::size_t N>
+Bitset<N>& Bitset<N>::operator&=(const Bitset<N>& other) {
+    *this = *this & other;
+    return *this;
+}
+
+template <std::size_t N>
+Bitset<N>& Bitset<N>::operator|=(const Bitset<N>& other) {
+    *this = *this | other;
+    return *this;
+}
+
+template <std::size_t N>
+Bitset<N>& Bitset<N>::operator^=(const Bitset<N>& other) {
+    *this = *this ^ other;
+    return *this;
+}
+
+template <std::size_t N>
+Bitset<N> Bitset<N>::operator~() {
+    Bitset<N> result;
+    for (int i = 0; i < length; ++i) {
+        result.bitset[i] = ~bitset[i];
+    }
+    return result;
+}
+
+template <std::size_t N>
+Bitset<N> Bitset<N>::operator<<(std::size_t shift) {
+    Bitset<N> result;
+    int byte_to_shift = shift / BYTE;
+    int bit_to_shift = shift % BYTE;
+    if (shift >= N) {
+        for (int i = 0; i < length; ++i) {
+            result.bitset[i] = 0;
+        }
+    } else {   
+        for (int i = length - 1; i > byte_to_shift - 1; --i) {
+            result.bitset[i] = bitset[i - byte_to_shift] << bit_to_shift;
+            if (i != byte_to_shift) {
+                result.bitset[i] |= (bitset[i - byte_to_shift - 1] >> (BYTE - bit_to_shift));
+            }
+        }    
+
+        for (int i = 0; i < byte_to_shift; ++i) {
+            result.bitset[i] = 0;
+        }    
+    }
+    return result;
+}
+
+template <std::size_t N>
+Bitset<N> Bitset<N>::operator>>(std::size_t shift) {
+    Bitset<N> result;
+    int byte_to_shift = shift / BYTE;
+    int bit_to_shift = shift % BYTE;
+    if (shift >= N) {
+        for (int i = 0; i < length; ++i) {
+            result.bitset[i] = 0;
+        }
+    } else {   
+        for (int i = 0; i <= length - byte_to_shift - 1; ++i) {
+            result.bitset[i] = bitset[i + byte_to_shift] >> bit_to_shift;
+            if (i != length - byte_to_shift - 1) {
+                result.bitset[i] |= (bitset[i + byte_to_shift + 1] << (BYTE - bit_to_shift));
+            }
+        }    
+        
+        for (int i = length - byte_to_shift; i < length; ++i) {
+            result.bitset[i] = 0;
+        }  
+    }
+    return result;
+}
+
+template <std::size_t N>
+Bitset<N>& Bitset<N>::operator<<=(std::size_t shift) {
+    *this = *this << shift;
+    return *this;
+}
+
+template <std::size_t N>
+Bitset<N>& Bitset<N>::operator>>=(std::size_t shift) {
+   *this = *this >> shift;
+    return *this;
+}
+
+template <std::size_t N>
+bool Bitset<N>::operator==(const Bitset<N>& other) const {
+    for (std::size_t i = 0; i < length; ++i) {
+        if (bitset[i] != other.bitset[i]) {
+            return false;
+        }
+    }
+    return true;
+}
+
+template <std::size_t N>
+bool Bitset<N>::operator!=(const Bitset<N>& other) const {
+    return !(*this == other);
+}
+
+template <std::size_t N>
 void Bitset<N>::check_out_of_range(std::size_t pos) const {
     if (pos >= N) {
         throw std::out_of_range("Index is out of range");
@@ -213,12 +343,36 @@ int Bitset<N>::size() const {
     return N;
 }
 
-template <std::size_t M>
-std::ostream& operator<<(std::ostream& os, const Bitset<M>& set) {  
-    for (int i = M - 1; i >= 0; --i) {
+template <std::size_t N>
+std::ostream& operator<<(std::ostream& os, const Bitset<N>& set) {  
+    for (int i = N - 1; i >= 0; --i) {
         os << set.test(i);
     }   
     return os;
+}
+
+template <std::size_t N>
+std::istream& operator>>(std::istream& is, Bitset<N>& bs) {
+    std::string input;
+    is >> input;
+
+    if (input.size() > N) {
+        input = input.substr(0, N);
+    }
+
+    // clearing the bitset
+    for (std::size_t i = 0; i < bs.length; ++i) {
+        bs.bitset[i] = 0;
+    }
+
+    std::size_t len = input.size();
+    for (int i = 0; i < N && i < input.size(); ++i) {
+        if (input[len - i - 1] == '1') {
+            bs.set(i);
+        }
+    }
+
+    return is;
 }
 
 template <std::size_t N>
