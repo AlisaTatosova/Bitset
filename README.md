@@ -43,6 +43,9 @@ bitset[1] = 00000001
 - **`reset(std::size_t pos)`**: Resets the bit at position `pos` to 0.
 - **`flip(std::size_t pos)`**: Flips the bit at position `pos`.
 - **`count()`**: Returns the number of bits set to 1.
+- **any()**: Checks if any bit is set.
+- **none()**: Checks if no bits are set.
+- **all()**: Checks if all bits are set.
 
 ### Bitwise Operations
 
@@ -61,6 +64,10 @@ bitset[1] = 00000001
 - **Shift Left Assignment (`<<=`)**: Shifts the bitset to the left by a specified number of positions, modifying the current bitset.
 - **Shift Right Assignment (`>>=`)**: Shifts the bitset to the right by a specified number of positions, modifying the current bitset.
 
+### Subscript operator(operator[])
+
+- **Non-const version**: Allows both reading and writing to individual bits.
+- **Const version**: Allows reading of individual bits without modification.
 
 ### Comparison Operators
 
