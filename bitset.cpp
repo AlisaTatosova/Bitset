@@ -2,7 +2,7 @@
 
 template <std::size_t N>
 void Bitset<N>::initialize() {
-    int length = N / BYTE + (N % BYTE != 0);
+    std::size_t length = N / BYTE + (N % BYTE != 0);
     unsigned char* bitset = new unsigned char[length]();
     this -> bitset = bitset; 
     this -> length = length;
@@ -28,6 +28,7 @@ Bitset<N>::Bitset(const std::string& bits) {
         } 
     }
 }
+
 template <std::size_t N>
 Bitset<N>::Bitset(unsigned long long number) {
     initialize(); 
@@ -117,8 +118,8 @@ void Bitset<N>::flip(std::size_t index) {
 }
 
 template <std::size_t N>
-int Bitset<N>::count() const {
-    int count {};
+std::size_t Bitset<N>::count() const {
+    std::size_t count {};
     for (int i = 0; i < N; ++i) {
         if (test(i)) {
             ++count;
@@ -177,7 +178,7 @@ bool Bitset<N>::operator[](std::size_t index) const {
 }
 
 template <std::size_t N>
-Bitset<N> Bitset<N>::operator&(const Bitset<N>& other) {
+Bitset<N> Bitset<N>::operator&(const Bitset<N>& other) const {
     Bitset<N> result;
     for (size_t i = 0; i < length; ++i) {
         result.bitset[i] = bitset[i] & other.bitset[i];
@@ -186,7 +187,7 @@ Bitset<N> Bitset<N>::operator&(const Bitset<N>& other) {
 }
 
 template <std::size_t N>
-Bitset<N> Bitset<N>::operator|(const Bitset<N>& other) {
+Bitset<N> Bitset<N>::operator|(const Bitset<N>& other) const {
     Bitset<N> result;
     for (size_t i = 0; i < length; ++i) {
         result.bitset[i] = bitset[i] | other.bitset[i];
@@ -195,7 +196,7 @@ Bitset<N> Bitset<N>::operator|(const Bitset<N>& other) {
 }
 
 template <std::size_t N>
-Bitset<N> Bitset<N>::operator^(const Bitset<N>& other) {
+Bitset<N> Bitset<N>::operator^(const Bitset<N>& other) const {
     Bitset<N> result;
     for (size_t i = 0; i < length; ++i) {
         result.bitset[i] = bitset[i] ^ other.bitset[i];
@@ -222,7 +223,7 @@ Bitset<N>& Bitset<N>::operator^=(const Bitset<N>& other) {
 }
 
 template <std::size_t N>
-Bitset<N> Bitset<N>::operator~() {
+Bitset<N> Bitset<N>::operator~() const {
     Bitset<N> result;
     for (int i = 0; i < length; ++i) {
         result.bitset[i] = ~bitset[i];
@@ -231,15 +232,11 @@ Bitset<N> Bitset<N>::operator~() {
 }
 
 template <std::size_t N>
-Bitset<N> Bitset<N>::operator<<(std::size_t shift) {
+Bitset<N> Bitset<N>::operator<<(std::size_t shift) const {
     Bitset<N> result;
     int byte_to_shift = shift / BYTE;
     int bit_to_shift = shift % BYTE;
-    if (shift >= N) {
-        for (int i = 0; i < length; ++i) {
-            result.bitset[i] = 0;
-        }
-    } else {   
+    if (shift < N) {
         for (int i = length - 1; i > byte_to_shift - 1; --i) {
             result.bitset[i] = bitset[i - byte_to_shift] << bit_to_shift;
             if (i != byte_to_shift) {
@@ -249,26 +246,26 @@ Bitset<N> Bitset<N>::operator<<(std::size_t shift) {
 
         for (int i = 0; i < byte_to_shift; ++i) {
             result.bitset[i] = 0;
-        }    
+        }  
+
+        for (int i = N; i < length * BYTE; ++i) {  // clearing the remaining bits of last byte that accidently could have been set by left shift 
+            result.bitset[i / BYTE] &= ~get_mask(i);
+        }   
     }
     return result;
 }
 
 template <std::size_t N>
-Bitset<N> Bitset<N>::operator>>(std::size_t shift) {
+Bitset<N> Bitset<N>::operator>>(std::size_t shift) const {
     Bitset<N> result;
     int byte_to_shift = shift / BYTE;
     int bit_to_shift = shift % BYTE;
-    if (shift >= N) {
-        for (int i = 0; i < length; ++i) {
-            result.bitset[i] = 0;
-        }
-    } else {   
+    if (shift < N) {   
         for (int i = 0; i <= length - byte_to_shift - 1; ++i) {
             result.bitset[i] = bitset[i + byte_to_shift] >> bit_to_shift;
             if (i != length - byte_to_shift - 1) {
                 result.bitset[i] |= (bitset[i + byte_to_shift + 1] << (BYTE - bit_to_shift));
-            }
+            } 
         }    
         
         for (int i = length - byte_to_shift; i < length; ++i) {
@@ -316,7 +313,7 @@ template <std::size_t N>
 unsigned long Bitset<N>::to_ulong() const{
     unsigned long result = 0;
     for (int i = 0; i < N; ++i) {
-        if (i > sizeof(unsigned long) * 8 && test(i)) {
+        if (i > sizeof(unsigned long) * BYTE && test(i)) {
             throw std::overflow_error("Bitset size exceeds the maximum number of bits in an unsigned long.");
         }
 
@@ -339,8 +336,15 @@ std::string Bitset<N>::to_string() const {
 }
 
 template <std::size_t N>
-int Bitset<N>::size() const {
+std::size_t Bitset<N>::size() const {
     return N;
+}
+
+template <std::size_t N>
+void Bitset<N>::clear_bitset() {
+    for (std::size_t  i = 0; i < length; ++i) {
+        bitset[i] = 0;
+    }
 }
 
 template <std::size_t N>
@@ -355,16 +359,11 @@ template <std::size_t N>
 std::istream& operator>>(std::istream& is, Bitset<N>& bs) {
     std::string input;
     is >> input;
-
     if (input.size() > N) {
         input = input.substr(0, N);
     }
 
-    // clearing the bitset
-    for (std::size_t i = 0; i < bs.length; ++i) {
-        bs.bitset[i] = 0;
-    }
-
+    bs.clear_bitset();
     std::size_t len = input.size();
     for (int i = 0; i < N && i < input.size(); ++i) {
         if (input[len - i - 1] == '1') {

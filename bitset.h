@@ -18,22 +18,22 @@ public:
     void set(std::size_t index, bool value = true);
     void reset(std::size_t index);
     void flip(std::size_t index);
-    int count() const;
+    std::size_t count() const;
     bool any() const;
     bool none() const;
     bool all() const;
     bool test(std::size_t index) const;
-    int size() const;
+    std::size_t size() const;
     unsigned long to_ulong() const;
     std::string to_string() const;
 
     BitManipulator<N> operator[](std::size_t index);
     bool operator[](std::size_t index) const;
-    
-    Bitset operator&(const Bitset& other);
-    Bitset operator|(const Bitset& other);
-    Bitset operator^(const Bitset& other);
-    Bitset operator~();
+
+    Bitset operator&(const Bitset& other) const;
+    Bitset operator|(const Bitset& other) const;
+    Bitset operator^(const Bitset& other) const;
+    Bitset operator~() const;
 
     Bitset& operator&=(const Bitset& other);
     Bitset& operator|=(const Bitset& other);
@@ -41,8 +41,8 @@ public:
 
     Bitset& operator>>=(std::size_t shift); 
     Bitset& operator<<=(std::size_t shift);
-    Bitset operator>>(std::size_t shift); 
-    Bitset operator<<(std::size_t shift);
+    Bitset operator>>(std::size_t shift) const; 
+    Bitset operator<<(std::size_t shift) const;
     
     bool operator==(const Bitset& other) const;
     bool operator!=(const Bitset& other) const;
@@ -57,6 +57,7 @@ public:
 
 private:
     void check_out_of_range(std::size_t pos) const;
+    void clear_bitset();
     std::size_t get_mask(std::size_t index) const;
 
 private:
