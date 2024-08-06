@@ -349,8 +349,10 @@ void Bitset<N>::clear_bitset() {
 
 template <std::size_t N>
 std::ostream& operator<<(std::ostream& os, const Bitset<N>& set) {  
-    for (int i = N - 1; i >= 0; --i) {
-        os << set.test(i);
+    if (set.bitset) {
+    	for (int i = N - 1; i >= 0; --i) {
+            os << set.test(i);
+	}
     }   
     return os;
 }
