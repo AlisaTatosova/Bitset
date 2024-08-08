@@ -94,4 +94,3 @@ NOTE! There are tests written in tests.cpp, so you can test by using them.
    
 2. Run:
 ./bitset
-
