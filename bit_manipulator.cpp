@@ -6,6 +6,17 @@ BitManipulator<N>::BitManipulator(Bitset<N>& bitset, std::size_t pos)
     : bitset{bitset}, pos{pos} {}
 
 template <std::size_t N>
+BitManipulator<N>::operator bool() {
+    return bitset.test(pos);
+}
+
+template <std::size_t N>
+BitManipulator<N>& BitManipulator<N>::operator=(const BitManipulator<N>& other) {
+    bitset.set(pos, other.bitset.test(other.pos));
+    return *this;
+}
+
+template <std::size_t N>
 BitManipulator<N>& BitManipulator<N>::operator=(bool value) {
     bitset.set(pos, value);
     return *this;
