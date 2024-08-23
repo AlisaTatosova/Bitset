@@ -2,6 +2,46 @@
 
 This repository contains implementation of a `Bitset`. The `Bitset` class is designed to represent a fixed-size sequence of bits with various operations.
 
+## Build Instructions
+
+1. **Clone the repository**:
+    ```sh
+    git clone https://github.com/AlisaTatosova/Bitset.git
+    cd Bitset
+    git submodule update --init --recursive
+    ```
+
+2. **Create a build directory**:
+    ```sh
+    mkdir build
+    cd build
+    ```
+
+3. **Run CMake to configure the project**:
+    ```sh
+    cmake ..
+    ```
+
+4. **Build the project**:
+    ```sh
+    cmake --build .
+    ```
+
+This will compile the source files and create an executable named `bitset` and `run_tests`.
+
+## Run the Program
+
+To run the tests, execute the following command from the `build` directory:
+
+```sh
+./run_tests
+```
+To run the main, execute the following command from the `build` directory:
+
+```sh
+./bitset
+```
+
 ## Overview
 
 Below is overview of implementation:
@@ -43,9 +83,6 @@ bitset[1] = 00000001
 - **`reset(std::size_t pos)`**: Resets the bit at position `pos` to 0.
 - **`flip(std::size_t pos)`**: Flips the bit at position `pos`.
 - **`count()`**: Returns the number of bits set to 1.
-- **any()**: Checks if any bit is set.
-- **none()**: Checks if no bits are set.
-- **all()**: Checks if all bits are set.
 
 ### Bitwise Operations
 
@@ -64,10 +101,6 @@ bitset[1] = 00000001
 - **Shift Left Assignment (`<<=`)**: Shifts the bitset to the left by a specified number of positions, modifying the current bitset.
 - **Shift Right Assignment (`>>=`)**: Shifts the bitset to the right by a specified number of positions, modifying the current bitset.
 
-### Subscript operator(operator[])
-
-- **Non-const version**: Allows both reading and writing to individual bits.
-- **Const version**: Allows reading of individual bits without modification.
 
 ### Comparison Operators
 
@@ -85,12 +118,3 @@ bitset[1] = 00000001
 - **Input (`>>`)**: Reads a binary string from an input stream and initializes the bitset.
 - **Output (`<<`)**: Outputs the bitset as a string representation of bits.
 
-## Usage
-To compile and run the project, follow these steps: 
-NOTE! There are tests written in tests.cpp, so you can test by using them.
-
-1. Compile using a C++ compiler (e.g., g++).
-   g++ main.cpp -o bitset
-   
-2. Run:
-./bitset
